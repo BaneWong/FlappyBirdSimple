@@ -10,6 +10,7 @@
 
 @interface MyScene() {
     SKSpriteNode* _bird;
+    SKColor* _skyColor;
 }
 @end
 
@@ -17,7 +18,21 @@
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
-        /* Setup your scene here */
+        // Setup sky
+        _skyColor = [SKColor colorWithRed:113.0/255.0 green:197.0/255.0 blue:207.0/255.0 alpha:1.0];
+        [self setBackgroundColor:_skyColor];
+        
+        // Create ground
+        
+        SKTexture* groundTexture = [SKTexture textureWithImageNamed:@"Ground"];
+        groundTexture.filteringMode = SKTextureFilteringNearest;
+        for (int i = 0; i < 2 + self.frame.size.width / (groundTexture.size.width * 2); ++i) {
+            // Add some ground sprites
+            
+        }
+        
+        
+        // Setup bird
         SKTexture* birdTexture1 = [SKTexture textureWithImageNamed:@"Bird1"];
         birdTexture1.filteringMode = SKTextureFilteringNearest;
         SKTexture* birdTexture2 = [SKTexture textureWithImageNamed:@"Bird2"];
