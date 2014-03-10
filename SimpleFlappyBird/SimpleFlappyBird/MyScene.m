@@ -10,6 +10,10 @@
 const float SKYLINE_MOVEMENT_SCALE = 0.01;
 const float GROUND_MOVEMENT_SCALE = 0.02;
 
+const float SKY_RED = 113.0/255.0;
+const float SKY_GREEN = 197.0/255.0;
+const float SKY_BLUE = 207.0/255.0;
+
 @interface MyScene() {
     SKSpriteNode* _bird;
     SKColor* _skyColor;
@@ -20,8 +24,10 @@ const float GROUND_MOVEMENT_SCALE = 0.02;
 
 -(id)initWithSize:(CGSize)size {    
     if (self = [super initWithSize:size]) {
+        self.physicsWorld.gravity = CGVectorMake(0.0, -5.0); // Set gravity
+        
         // Setup sky
-        _skyColor = [SKColor colorWithRed:113.0/255.0 green:197.0/255.0 blue:207.0/255.0 alpha:1.0];
+        _skyColor = [SKColor colorWithRed:SKY_RED green:SKY_GREEN blue:SKY_BLUE alpha:1.0];
         [self setBackgroundColor:_skyColor];
         
         // Create ground
@@ -42,6 +48,13 @@ const float GROUND_MOVEMENT_SCALE = 0.02;
             [groundSprite runAction:moveGroundSpritesForever];
             [self addChild:groundSprite];
         }
+        
+        // Create ground physics container
+        SKNode* groundContainer = [SKNode node];
+        groundContainer.position = CGPointMake(0, groundTexture.size.height);
+        groundContainer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(self.frame.size.width, groundTexture.size.height*2)];
+        groundContainer.physicsBody.dynamic = NO;
+        [self addChild:groundContainer];
         
         // Create skyline
         SKTexture* skylineTexture = [SKTexture textureWithImageNamed:@"Skyline"];
@@ -74,6 +87,12 @@ const float GROUND_MOVEMENT_SCALE = 0.02;
         [_bird setScale:2.0];
         _bird.position = CGPointMake(self.frame.size.width / 4, CGRectGetMidY(self.frame));
         [_bird runAction:flap];
+        
+        // Add physics to bird
+        _bird.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:_bird.size.height / 2];
+        _bird.physicsBody.dynamic = YES;
+        _bird.physicsBody.allowsRotation = NO;
+        
         [self addChild:_bird];
     }
     return self;
@@ -81,6 +100,8 @@ const float GROUND_MOVEMENT_SCALE = 0.02;
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
+    _bird.physicsBody.velocity = CGVectorMake(0, 0); // avoid impulse accumlation per touch
+    [_bird.physicsBody applyImpulse:CGVectorMake(0, 8)];
 
     
 }
