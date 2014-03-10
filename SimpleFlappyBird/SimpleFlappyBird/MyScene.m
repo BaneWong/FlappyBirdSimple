@@ -23,14 +23,29 @@
         [self setBackgroundColor:_skyColor];
         
         // Create ground
-        
         SKTexture* groundTexture = [SKTexture textureWithImageNamed:@"Ground"];
         groundTexture.filteringMode = SKTextureFilteringNearest;
+        
         for (int i = 0; i < 2 + self.frame.size.width / (groundTexture.size.width * 2); ++i) {
+
             // Add some ground sprites
-            
+            SKSpriteNode* groundSprite = [SKSpriteNode spriteNodeWithTexture:groundTexture];
+            [groundSprite setScale:2.0];
+            groundSprite.position = CGPointMake(i * groundSprite.size.width, groundSprite.size.height / 2);
+            [self addChild:groundSprite];
         }
         
+        // Create skyline
+        SKTexture* skylineTexture = [SKTexture textureWithImageNamed:@"Skyline"];
+        skylineTexture.filteringMode = SKTextureFilteringNearest;
+        
+        for (int i = 0; i < 2 + self.frame.size.width / (groundTexture.size.width * 2); ++i) {
+            SKSpriteNode* skylineSprite = [SKSpriteNode spriteNodeWithTexture:skylineTexture];
+            [skylineSprite setScale:2.0];
+            skylineSprite.zPosition = -20;
+            skylineSprite.position = CGPointMake(i * skylineSprite.size.width, skylineSprite.size.height / 2 + groundTexture.size.height * 2);
+            [self addChild:skylineSprite];
+        }
         
         // Setup bird
         SKTexture* birdTexture1 = [SKTexture textureWithImageNamed:@"Bird1"];
