@@ -18,13 +18,18 @@
 		E17E46F018CDD3C100C959BC /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E17E46EE18CDD3C100C959BC /* Main_iPad.storyboard */; };
 		E17E46F318CDD3C100C959BC /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E17E46F218CDD3C100C959BC /* ViewController.m */; };
 		E17E46F618CDD3C100C959BC /* MyScene.m in Sources */ = {isa = PBXBuildFile; fileRef = E17E46F518CDD3C100C959BC /* MyScene.m */; };
-		E17E46F818CDD3C100C959BC /* Spaceship.png in Resources */ = {isa = PBXBuildFile; fileRef = E17E46F718CDD3C100C959BC /* Spaceship.png */; };
 		E17E46FA18CDD3C100C959BC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E17E46F918CDD3C100C959BC /* Images.xcassets */; };
 		E17E470118CDD3C100C959BC /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E17E470018CDD3C100C959BC /* XCTest.framework */; };
 		E17E470218CDD3C100C959BC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E17E46D718CDD3C100C959BC /* Foundation.framework */; };
 		E17E470318CDD3C100C959BC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E17E46DB18CDD3C100C959BC /* UIKit.framework */; };
 		E17E470B18CDD3C100C959BC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E17E470918CDD3C100C959BC /* InfoPlist.strings */; };
 		E17E470D18CDD3C100C959BC /* SimpleFlappyBirdTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E17E470C18CDD3C100C959BC /* SimpleFlappyBirdTests.m */; };
+		E17E471718CDD48B00C959BC /* Bird1.png in Resources */ = {isa = PBXBuildFile; fileRef = E17E471618CDD48B00C959BC /* Bird1.png */; };
+		E17E471918CDD49800C959BC /* Bird2.png in Resources */ = {isa = PBXBuildFile; fileRef = E17E471818CDD49800C959BC /* Bird2.png */; };
+		E17E471E18CDD4AD00C959BC /* Pipe2.png in Resources */ = {isa = PBXBuildFile; fileRef = E17E471A18CDD4AD00C959BC /* Pipe2.png */; };
+		E17E471F18CDD4AD00C959BC /* Pipe1.png in Resources */ = {isa = PBXBuildFile; fileRef = E17E471B18CDD4AD00C959BC /* Pipe1.png */; };
+		E17E472018CDD4AD00C959BC /* Skyline.png in Resources */ = {isa = PBXBuildFile; fileRef = E17E471C18CDD4AD00C959BC /* Skyline.png */; };
+		E17E472118CDD4AD00C959BC /* Ground.png in Resources */ = {isa = PBXBuildFile; fileRef = E17E471D18CDD4AD00C959BC /* Ground.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,13 +60,18 @@
 		E17E46F218CDD3C100C959BC /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		E17E46F418CDD3C100C959BC /* MyScene.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyScene.h; sourceTree = "<group>"; };
 		E17E46F518CDD3C100C959BC /* MyScene.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyScene.m; sourceTree = "<group>"; };
-		E17E46F718CDD3C100C959BC /* Spaceship.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Spaceship.png; sourceTree = "<group>"; };
 		E17E46F918CDD3C100C959BC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		E17E46FF18CDD3C100C959BC /* SimpleFlappyBirdTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SimpleFlappyBirdTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E17E470018CDD3C100C959BC /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		E17E470818CDD3C100C959BC /* SimpleFlappyBirdTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SimpleFlappyBirdTests-Info.plist"; sourceTree = "<group>"; };
 		E17E470A18CDD3C100C959BC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E17E470C18CDD3C100C959BC /* SimpleFlappyBirdTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SimpleFlappyBirdTests.m; sourceTree = "<group>"; };
+		E17E471618CDD48B00C959BC /* Bird1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Bird1.png; sourceTree = "<group>"; };
+		E17E471818CDD49800C959BC /* Bird2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Bird2.png; sourceTree = "<group>"; };
+		E17E471A18CDD4AD00C959BC /* Pipe2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Pipe2.png; sourceTree = "<group>"; };
+		E17E471B18CDD4AD00C959BC /* Pipe1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Pipe1.png; sourceTree = "<group>"; };
+		E17E471C18CDD4AD00C959BC /* Skyline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Skyline.png; sourceTree = "<group>"; };
+		E17E471D18CDD4AD00C959BC /* Ground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Ground.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +133,7 @@
 		E17E46DF18CDD3C100C959BC /* SimpleFlappyBird */ = {
 			isa = PBXGroup;
 			children = (
+				E17E472218CDD4BE00C959BC /* Sprites */,
 				E17E46E818CDD3C100C959BC /* AppDelegate.h */,
 				E17E46E918CDD3C100C959BC /* AppDelegate.m */,
 				E17E46EB18CDD3C100C959BC /* Main_iPhone.storyboard */,
@@ -131,7 +142,6 @@
 				E17E46F218CDD3C100C959BC /* ViewController.m */,
 				E17E46F418CDD3C100C959BC /* MyScene.h */,
 				E17E46F518CDD3C100C959BC /* MyScene.m */,
-				E17E46F718CDD3C100C959BC /* Spaceship.png */,
 				E17E46F918CDD3C100C959BC /* Images.xcassets */,
 				E17E46E018CDD3C100C959BC /* Supporting Files */,
 			);
@@ -165,6 +175,19 @@
 				E17E470918CDD3C100C959BC /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E17E472218CDD4BE00C959BC /* Sprites */ = {
+			isa = PBXGroup;
+			children = (
+				E17E471618CDD48B00C959BC /* Bird1.png */,
+				E17E471818CDD49800C959BC /* Bird2.png */,
+				E17E471A18CDD4AD00C959BC /* Pipe2.png */,
+				E17E471B18CDD4AD00C959BC /* Pipe1.png */,
+				E17E471C18CDD4AD00C959BC /* Skyline.png */,
+				E17E471D18CDD4AD00C959BC /* Ground.png */,
+			);
+			name = Sprites;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -243,10 +266,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E17E46F818CDD3C100C959BC /* Spaceship.png in Resources */,
 				E17E46FA18CDD3C100C959BC /* Images.xcassets in Resources */,
+				E17E472018CDD4AD00C959BC /* Skyline.png in Resources */,
+				E17E471918CDD49800C959BC /* Bird2.png in Resources */,
 				E17E46F018CDD3C100C959BC /* Main_iPad.storyboard in Resources */,
+				E17E471F18CDD4AD00C959BC /* Pipe1.png in Resources */,
 				E17E46ED18CDD3C100C959BC /* Main_iPhone.storyboard in Resources */,
+				E17E471718CDD48B00C959BC /* Bird1.png in Resources */,
+				E17E471E18CDD4AD00C959BC /* Pipe2.png in Resources */,
+				E17E472118CDD4AD00C959BC /* Ground.png in Resources */,
 				E17E46E418CDD3C100C959BC /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
