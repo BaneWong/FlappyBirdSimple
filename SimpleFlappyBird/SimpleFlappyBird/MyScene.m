@@ -7,14 +7,9 @@
 //
 
 #import "MyScene.h"
-static const float SKYLINE_MOVEMENT_SCALE = 0.01;
-static const float GROUND_MOVEMENT_SCALE = 0.02;
 
-static const float SKY_RED = 113.0/255.0;
-static const float SKY_GREEN = 197.0/255.0;
-static const float SKY_BLUE = 207.0/255.0;
 
-@interface MyScene() {
+@interface MyScene() <SKPhysicsContactDelegate> {
     SKSpriteNode* _bird;
     SKColor* _skyColor;
     SKTexture* _pipeTexture1;
@@ -23,13 +18,31 @@ static const float SKY_BLUE = 207.0/255.0;
 }
 @end
 
+
+
 @implementation MyScene
+
+// Colliison detection bitmasks
+static const uint32_t birdCategory = 1 << 0;  // 001
+static const uint32_t worldCategory = 1 << 1; // 010
+static const uint32_t pipeCategory = 1 << 2; //  100
+
+// Parallax scrolling speed constants
+static const float SKYLINE_MOVEMENT_SCALE = 0.01;
+static const float GROUND_MOVEMENT_SCALE = 0.02;
+
+// Sky color constant
+static const float SKY_RED = 113.0/255.0;
+static const float SKY_GREEN = 197.0/255.0;
+static const float SKY_BLUE = 207.0/255.0;
+
 
 static NSInteger const kVerticalPipeGap = 100;
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
         self.physicsWorld.gravity = CGVectorMake(0.0, -5.0); // Set gravity
+        self.physicsWorld.contactDelegate = self; // handle collisions
         
         // Setup sky
         _skyColor = [SKColor colorWithRed:SKY_RED green:SKY_GREEN blue:SKY_BLUE alpha:1.0];
@@ -80,37 +93,39 @@ static NSInteger const kVerticalPipeGap = 100;
             [self addChild:skylineSprite];
         }
         
-        // Setup bird
-        SKTexture* birdTexture1 = [SKTexture textureWithImageNamed:@"Bird1"];
-        birdTexture1.filteringMode = SKTextureFilteringNearest;
-        SKTexture* birdTexture2 = [SKTexture textureWithImageNamed:@"Bird2"];
-        birdTexture2.filteringMode = SKTextureFilteringNearest;
         
-        // Cycle through the two flapping images forever
-        SKAction* flap = [SKAction repeatActionForever:[SKAction animateWithTextures:@[birdTexture1, birdTexture2] timePerFrame:0.2]];
-        _bird = [SKSpriteNode spriteNodeWithTexture:birdTexture1];
-        [_bird setScale:2.0];
-        _bird.position = CGPointMake(self.frame.size.width / 4, CGRectGetMidY(self.frame));
-        [_bird runAction:flap];
-        
-        // Add physics to bird
-        _bird.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:_bird.size.height / 2];
-        _bird.physicsBody.dynamic = YES;
-        _bird.physicsBody.allowsRotation = NO;
-        
-        [self addChild:_bird];
-        
+        [self initBird];
         [self initPipes]; // load the pipe textures and action
         
-        // call spawnPipes regularly
-        SKAction* spawn = [SKAction performSelector:@selector(spawnPipes) onTarget:self];
-        SKAction* delay = [SKAction waitForDuration:2.0];
-        SKAction* spawnThenDelay = [SKAction sequence:@[spawn, delay]];
-        SKAction* spawnThenDelayForever = [SKAction repeatActionForever:spawnThenDelay];
-        [self runAction:spawnThenDelayForever];
-        
+
     }
     return self;
+}
+
+-(void) initBird {
+    // Setup bird
+    SKTexture* birdTexture1 = [SKTexture textureWithImageNamed:@"Bird1"];
+    birdTexture1.filteringMode = SKTextureFilteringNearest;
+    SKTexture* birdTexture2 = [SKTexture textureWithImageNamed:@"Bird2"];
+    birdTexture2.filteringMode = SKTextureFilteringNearest;
+    
+    // Cycle through the two flapping images forever
+    SKAction* flap = [SKAction repeatActionForever:[SKAction animateWithTextures:@[birdTexture1, birdTexture2] timePerFrame:0.2]];
+    _bird = [SKSpriteNode spriteNodeWithTexture:birdTexture1];
+    [_bird setScale:2.0];
+    _bird.position = CGPointMake(self.frame.size.width / 4, CGRectGetMidY(self.frame));
+    [_bird runAction:flap];
+    
+    // Add physics to bird
+    _bird.physicsBody = [SKPhysicsBody bodyWithCircleOfRadius:_bird.size.height / 2];
+    _bird.physicsBody.dynamic = YES;
+    _bird.physicsBody.allowsRotation = NO;
+    
+    _bird.physicsBody.categoryBitMask = birdCategory;
+    _bird.physicsBody.collisionBitMask = worldCategory | pipeCategory; // the bird may collide with the world or pipes
+    _bird.physicsBody.contactTestBitMask = worldCategory | pipeCategory; // notify me of world or pipe collisions
+    
+    [self addChild:_bird];
 }
 
 // Adds pipes to the game
@@ -126,6 +141,14 @@ static NSInteger const kVerticalPipeGap = 100;
     SKAction* movePipes = [SKAction moveByX:-distanceToMove y:0 duration:0.01 * distanceToMove];
     SKAction* removePipes = [SKAction removeFromParent];
     _moveAndRemovePipes = [SKAction sequence:@[movePipes, removePipes]];
+    
+    // call spawnPipes regularly
+    SKAction* spawn = [SKAction performSelector:@selector(spawnPipes) onTarget:self];
+    SKAction* delay = [SKAction waitForDuration:2.0];
+    SKAction* spawnThenDelay = [SKAction sequence:@[spawn, delay]];
+    SKAction* spawnThenDelayForever = [SKAction repeatActionForever:spawnThenDelay];
+    [self runAction:spawnThenDelayForever];
+    
 }
 
 -(void) spawnPipes {
