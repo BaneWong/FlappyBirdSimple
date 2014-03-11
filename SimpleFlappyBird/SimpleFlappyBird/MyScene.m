@@ -100,7 +100,15 @@ static NSInteger const kVerticalPipeGap = 100;
         
         [self addChild:_bird];
         
-        [self initPipes];
+        [self initPipes]; // load the pipe textures and action
+        
+        // call spawnPipes regularly
+        SKAction* spawn = [SKAction performSelector:@selector(spawnPipes) onTarget:self];
+        SKAction* delay = [SKAction waitForDuration:2.0];
+        SKAction* spawnThenDelay = [SKAction sequence:@[spawn, delay]];
+        SKAction* spawnThenDelayForever = [SKAction repeatActionForever:spawnThenDelay];
+        [self runAction:spawnThenDelayForever];
+        
     }
     return self;
 }
@@ -112,8 +120,17 @@ static NSInteger const kVerticalPipeGap = 100;
     _pipeTexture1.filteringMode = SKTextureFilteringNearest;
     _pipeTexture2.filteringMode = SKTextureFilteringNearest;
     
+    
+    // set up pipe movement and removement
+    CGFloat distanceToMove = self.frame.size.width + 2 * _pipeTexture1.size.width;
+    SKAction* movePipes = [SKAction moveByX:-distanceToMove y:0 duration:0.01 * distanceToMove];
+    SKAction* removePipes = [SKAction removeFromParent];
+    _moveAndRemovePipes = [SKAction sequence:@[movePipes, removePipes]];
+}
+
+-(void) spawnPipes {
     SKNode* pipePair = [SKNode node];
-    pipePair.position = CGPointMake(self.frame.size.width + _pipeTexture1.size.width *2, 0);
+    pipePair.position = CGPointMake(self.frame.size.width + _pipeTexture1.size.width, 0);
     pipePair.zPosition = -10;
     
     CGFloat y = arc4random() % (NSInteger) (self.frame.size.height / 3); // random pipe height
@@ -133,17 +150,17 @@ static NSInteger const kVerticalPipeGap = 100;
     [pipePair addChild:pipe1];
     [pipePair addChild:pipe2];
     
-    SKAction* movePipes = [SKAction repeatActionForever:[SKAction moveByX:-1 y:0 duration:GROUND_MOVEMENT_SCALE]];
-    [pipePair runAction:movePipes];
+    [pipePair runAction:_moveAndRemovePipes];
     
     [self addChild:pipePair];
-    
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
     _bird.physicsBody.velocity = CGVectorMake(0, 0); // avoid impulse accumlation per touch
     [_bird.physicsBody applyImpulse:CGVectorMake(0, 8)];
+
+
 
     
 }
