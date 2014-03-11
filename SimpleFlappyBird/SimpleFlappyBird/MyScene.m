@@ -7,22 +7,27 @@
 //
 
 #import "MyScene.h"
-const float SKYLINE_MOVEMENT_SCALE = 0.01;
-const float GROUND_MOVEMENT_SCALE = 0.02;
+static const float SKYLINE_MOVEMENT_SCALE = 0.01;
+static const float GROUND_MOVEMENT_SCALE = 0.02;
 
-const float SKY_RED = 113.0/255.0;
-const float SKY_GREEN = 197.0/255.0;
-const float SKY_BLUE = 207.0/255.0;
+static const float SKY_RED = 113.0/255.0;
+static const float SKY_GREEN = 197.0/255.0;
+static const float SKY_BLUE = 207.0/255.0;
 
 @interface MyScene() {
     SKSpriteNode* _bird;
     SKColor* _skyColor;
+    SKTexture* _pipeTexture1;
+    SKTexture* _pipeTexture2;
+    SKAction* _moveAndRemovePipes;
 }
 @end
 
 @implementation MyScene
 
--(id)initWithSize:(CGSize)size {    
+static NSInteger const kVerticalPipeGap = 100;
+
+-(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
         self.physicsWorld.gravity = CGVectorMake(0.0, -5.0); // Set gravity
         
@@ -94,8 +99,45 @@ const float SKY_BLUE = 207.0/255.0;
         _bird.physicsBody.allowsRotation = NO;
         
         [self addChild:_bird];
+        
+        [self initPipes];
     }
     return self;
+}
+
+// Adds pipes to the game
+-(void) initPipes {
+    _pipeTexture1 = [SKTexture textureWithImageNamed:@"Pipe1"];
+    _pipeTexture2 = [SKTexture textureWithImageNamed:@"Pipe2"];
+    _pipeTexture1.filteringMode = SKTextureFilteringNearest;
+    _pipeTexture2.filteringMode = SKTextureFilteringNearest;
+    
+    SKNode* pipePair = [SKNode node];
+    pipePair.position = CGPointMake(self.frame.size.width + _pipeTexture1.size.width *2, 0);
+    pipePair.zPosition = -10;
+    
+    CGFloat y = arc4random() % (NSInteger) (self.frame.size.height / 3); // random pipe height
+    
+    SKSpriteNode* pipe1 = [SKSpriteNode spriteNodeWithTexture:_pipeTexture1];
+    [pipe1 setScale:2];
+    pipe1.position = CGPointMake(0, y);
+    pipe1.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:pipe1.size];
+    pipe1.physicsBody.dynamic = NO;
+    
+    SKSpriteNode* pipe2 = [SKSpriteNode spriteNodeWithTexture:_pipeTexture2];
+    [pipe2 setScale:2];
+    pipe2.position = CGPointMake(0, y + pipe1.size.height + kVerticalPipeGap);
+    pipe2.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:pipe2.size];
+    pipe2.physicsBody.dynamic = NO;
+    
+    [pipePair addChild:pipe1];
+    [pipePair addChild:pipe2];
+    
+    SKAction* movePipes = [SKAction repeatActionForever:[SKAction moveByX:-1 y:0 duration:GROUND_MOVEMENT_SCALE]];
+    [pipePair runAction:movePipes];
+    
+    [self addChild:pipePair];
+    
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
