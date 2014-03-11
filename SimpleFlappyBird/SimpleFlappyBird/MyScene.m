@@ -106,8 +106,22 @@ const float SKY_BLUE = 207.0/255.0;
     
 }
 
+// keeps value within a certain range
+CGFloat clamp(CGFloat min, CGFloat max, CGFloat value) {
+    if (value > max) {
+        return max;
+    } else if (value < min) {
+        return min;
+    } else {
+        return value;
+    }
+}
+
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
+    
+    // modify the bird's pitch based on its velocity vector
+    _bird.zRotation = clamp( -1, 0.5, _bird.physicsBody.velocity.dy * ( _bird.physicsBody.velocity.dy < 0 ? 0.003 : 0.001 ) );
 }
 
 @end
