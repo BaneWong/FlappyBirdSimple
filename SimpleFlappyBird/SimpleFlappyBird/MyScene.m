@@ -15,6 +15,7 @@
     SKTexture* _pipeTexture1;
     SKTexture* _pipeTexture2;
     SKAction* _moveAndRemovePipes;
+    SKNode* _moving;
 }
 @end
 
@@ -51,6 +52,10 @@ static NSInteger const kVerticalPipeGap = 100;
         _skyColor = [SKColor colorWithRed:SKY_RED green:SKY_GREEN blue:SKY_BLUE alpha:1.0];
         [self setBackgroundColor:_skyColor];
         
+        // Dummy parent to stop moving entitites
+        _moving = [SKNode node];
+        [self addChild:_moving];
+        
         // Create ground
         SKTexture* groundTexture = [SKTexture textureWithImageNamed:@"Ground"];
         groundTexture.filteringMode = SKTextureFilteringNearest;
@@ -67,7 +72,7 @@ static NSInteger const kVerticalPipeGap = 100;
             [groundSprite setScale:2.0];
             groundSprite.position = CGPointMake(i * groundSprite.size.width, groundSprite.size.height / 2);
             [groundSprite runAction:moveGroundSpritesForever];
-            [self addChild:groundSprite];
+            [_moving addChild:groundSprite];
         }
         
         // Create ground physics container
@@ -91,12 +96,14 @@ static NSInteger const kVerticalPipeGap = 100;
 
         
         for (int i = 0; i < 2 + self.frame.size.width / (groundTexture.size.width * 2); ++i) {
+            
+            // add some skyline sprites
             SKSpriteNode* skylineSprite = [SKSpriteNode spriteNodeWithTexture:skylineTexture];
             [skylineSprite setScale:2.0];
             skylineSprite.zPosition = -20;
             skylineSprite.position = CGPointMake(i * skylineSprite.size.width, skylineSprite.size.height / 2 + groundTexture.size.height * 2);
             [skylineSprite runAction:moveSkylineSpritesForever];
-            [self addChild:skylineSprite];
+            [_moving addChild:skylineSprite];
         }
         
         
@@ -185,26 +192,33 @@ static NSInteger const kVerticalPipeGap = 100;
     
     [pipePair runAction:_moveAndRemovePipes];
     
-    [self addChild:pipePair];
+    [_moving addChild:pipePair];
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
-    _bird.physicsBody.velocity = CGVectorMake(0, 0); // avoid impulse accumlation per touch
-    [_bird.physicsBody applyImpulse:CGVectorMake(0, TOUCH_IMPULSE)];
+    if(_moving.speed > 0) {
+        _bird.physicsBody.velocity = CGVectorMake(0, 0); // avoid impulse accumlation per touch
+        [_bird.physicsBody applyImpulse:CGVectorMake(0, TOUCH_IMPULSE)];
+        
+    }
     
 }
 
 - (void) didBeginContact:(SKPhysicsContact *)contact {
     // Flash background if contact is detected
-    [self removeActionForKey:@"flash"];
-    [self runAction:[SKAction sequence:@[
-                                         [SKAction repeatAction:[SKAction sequence:@[[SKAction runBlock:^{
-                                            self.backgroundColor = [SKColor redColor];
-                                        }], [SKAction waitForDuration:0.05], [SKAction runBlock:^{
-                                            self.backgroundColor = _skyColor;
-                                        }], [SKAction waitForDuration:0.05]]] count:4]]
-                     ] withKey:@"flash"];
+    if (_moving.speed > 0) {
+        _moving.speed = 0;
+    
+        [self removeActionForKey:@"flash"];
+        [self runAction:[SKAction sequence:@[
+                                             [SKAction repeatAction:[SKAction sequence:@[[SKAction runBlock:^{
+                                                self.backgroundColor = [SKColor redColor];
+                                            }], [SKAction waitForDuration:0.05], [SKAction runBlock:^{
+                                                self.backgroundColor = _skyColor;
+                                            }], [SKAction waitForDuration:0.05]]] count:4]]
+                         ] withKey:@"flash"];
+    }
 }
 
 // keeps value within a certain range
