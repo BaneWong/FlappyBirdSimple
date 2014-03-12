@@ -197,7 +197,7 @@ static NSInteger const kVerticalPipeGap = 100;
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
-    if(_moving.speed > 0) {
+    if(_moving.speed > 0) { // only allow input if the world is still moving
         _bird.physicsBody.velocity = CGVectorMake(0, 0); // avoid impulse accumlation per touch
         [_bird.physicsBody applyImpulse:CGVectorMake(0, TOUCH_IMPULSE)];
         
@@ -208,7 +208,7 @@ static NSInteger const kVerticalPipeGap = 100;
 - (void) didBeginContact:(SKPhysicsContact *)contact {
     // Flash background if contact is detected
     if (_moving.speed > 0) {
-        _moving.speed = 0;
+        _moving.speed = 0; // stop the world from moving
     
         [self removeActionForKey:@"flash"];
         [self runAction:[SKAction sequence:@[
