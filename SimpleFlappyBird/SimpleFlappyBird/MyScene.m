@@ -16,6 +16,8 @@
     SKTexture* _pipeTexture2;
     SKAction* _moveAndRemovePipes;
     SKNode* _moving;
+    SKNode* _pipes; // parent for all pipe nodes
+    BOOL _canRestart;
 }
 @end
 
@@ -45,6 +47,7 @@ static NSInteger const kVerticalPipeGap = 100;
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
+        _canRestart = NO;
         self.physicsWorld.gravity = CGVectorMake(0.0, -5.0); // Set gravity
         self.physicsWorld.contactDelegate = self; // handle collisions
         
@@ -55,6 +58,9 @@ static NSInteger const kVerticalPipeGap = 100;
         // Dummy parent to stop moving entitites
         _moving = [SKNode node];
         [self addChild:_moving];
+        
+        _pipes = [SKNode node];
+        [_moving addChild:_pipes];
         
         // Create ground
         SKTexture* groundTexture = [SKTexture textureWithImageNamed:@"Ground"];
@@ -141,7 +147,7 @@ static NSInteger const kVerticalPipeGap = 100;
     [self addChild:_bird];
 }
 
-// Adds pipes to the game
+// load pipe textures and animations
 -(void) initPipes {
     _pipeTexture1 = [SKTexture textureWithImageNamed:@"Pipe1"];
     _pipeTexture2 = [SKTexture textureWithImageNamed:@"Pipe2"];
@@ -192,7 +198,7 @@ static NSInteger const kVerticalPipeGap = 100;
     
     [pipePair runAction:_moveAndRemovePipes];
     
-    [_moving addChild:pipePair];
+    [_pipes addChild:pipePair];
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -201,6 +207,8 @@ static NSInteger const kVerticalPipeGap = 100;
         _bird.physicsBody.velocity = CGVectorMake(0, 0); // avoid impulse accumlation per touch
         [_bird.physicsBody applyImpulse:CGVectorMake(0, TOUCH_IMPULSE)];
         
+    } else if (_canRestart)  {
+        [self resetScene];
     }
     
 }
@@ -211,13 +219,14 @@ static NSInteger const kVerticalPipeGap = 100;
         _moving.speed = 0; // stop the world from moving
     
         [self removeActionForKey:@"flash"];
-        [self runAction:[SKAction sequence:@[
-                                             [SKAction repeatAction:[SKAction sequence:@[[SKAction runBlock:^{
-                                                self.backgroundColor = [SKColor redColor];
-                                            }], [SKAction waitForDuration:0.05], [SKAction runBlock:^{
-                                                self.backgroundColor = _skyColor;
-                                            }], [SKAction waitForDuration:0.05]]] count:4]]
-                         ] withKey:@"flash"];
+        
+        [self runAction:[SKAction sequence:@[[SKAction repeatAction:[SKAction sequence:@[[SKAction runBlock:^{
+            self.backgroundColor = [SKColor redColor];
+        }], [SKAction waitForDuration:0.05], [SKAction runBlock:^{
+            self.backgroundColor = _skyColor;
+        }], [SKAction waitForDuration:0.05]]] count:4], [SKAction runBlock:^{
+            _canRestart = YES;
+        }]]] withKey:@"flash"];;
     }
 }
 
@@ -237,6 +246,21 @@ CGFloat clamp(CGFloat min, CGFloat max, CGFloat value) {
     
     // modify the bird's pitch based on its velocity vector
     _bird.zRotation = clamp( -1, 0.5, _bird.physicsBody.velocity.dy * ( _bird.physicsBody.velocity.dy < 0 ? 0.003 : 0.001 ) );
+}
+
+- (void) resetScene {
+    // Move bird to original position and reset velocity
+    _bird.position = CGPointMake(self.frame.size.width / 4, CGRectGetMidY(self.frame)); // reset to original position
+    _bird.physicsBody.velocity = (CGVectorMake(0, 0));
+    
+    // Remove all existing pipes
+    [_pipes removeAllChildren];
+    
+    // Reset _canRestart
+    _canRestart = NO;
+    
+    // Restart animation
+    _moving.speed = 1;
 }
 
 @end
