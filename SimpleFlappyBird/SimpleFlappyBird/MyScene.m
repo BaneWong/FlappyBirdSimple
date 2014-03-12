@@ -31,11 +31,14 @@ static const uint32_t pipeCategory = 1 << 2; //  100
 static const float SKYLINE_MOVEMENT_SCALE = 0.01;
 static const float GROUND_MOVEMENT_SCALE = 0.02;
 
+
 // Sky color constant
 static const float SKY_RED = 113.0/255.0;
 static const float SKY_GREEN = 197.0/255.0;
 static const float SKY_BLUE = 207.0/255.0;
 
+// default flappybird impulse when touched
+static const float TOUCH_IMPULSE = 6;
 
 static NSInteger const kVerticalPipeGap = 100;
 
@@ -72,6 +75,9 @@ static NSInteger const kVerticalPipeGap = 100;
         groundContainer.position = CGPointMake(0, groundTexture.size.height);
         groundContainer.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(self.frame.size.width, groundTexture.size.height*2)];
         groundContainer.physicsBody.dynamic = NO;
+        
+        groundContainer.physicsBody.categoryBitMask = worldCategory;
+        
         [self addChild:groundContainer];
         
         // Create skyline
@@ -163,12 +169,16 @@ static NSInteger const kVerticalPipeGap = 100;
     pipe1.position = CGPointMake(0, y);
     pipe1.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:pipe1.size];
     pipe1.physicsBody.dynamic = NO;
+    pipe1.physicsBody.categoryBitMask = pipeCategory;
+    pipe1.physicsBody.contactTestBitMask = birdCategory;
     
     SKSpriteNode* pipe2 = [SKSpriteNode spriteNodeWithTexture:_pipeTexture2];
     [pipe2 setScale:2];
     pipe2.position = CGPointMake(0, y + pipe1.size.height + kVerticalPipeGap);
     pipe2.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:pipe2.size];
     pipe2.physicsBody.dynamic = NO;
+    pipe2.physicsBody.categoryBitMask = pipeCategory;
+    pipe2.physicsBody.contactTestBitMask = birdCategory;
     
     [pipePair addChild:pipe1];
     [pipePair addChild:pipe2];
@@ -181,11 +191,20 @@ static NSInteger const kVerticalPipeGap = 100;
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
     _bird.physicsBody.velocity = CGVectorMake(0, 0); // avoid impulse accumlation per touch
-    [_bird.physicsBody applyImpulse:CGVectorMake(0, 8)];
-
-
-
+    [_bird.physicsBody applyImpulse:CGVectorMake(0, TOUCH_IMPULSE)];
     
+}
+
+- (void) didBeginContact:(SKPhysicsContact *)contact {
+    // Flash background if contact is detected
+    [self removeActionForKey:@"flash"];
+    [self runAction:[SKAction sequence:@[
+                                         [SKAction repeatAction:[SKAction sequence:@[[SKAction runBlock:^{
+                                            self.backgroundColor = [SKColor redColor];
+                                        }], [SKAction waitForDuration:0.05], [SKAction runBlock:^{
+                                            self.backgroundColor = _skyColor;
+                                        }], [SKAction waitForDuration:0.05]]] count:4]]
+                     ] withKey:@"flash"];
 }
 
 // keeps value within a certain range
