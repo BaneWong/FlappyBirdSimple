@@ -217,6 +217,11 @@ static NSInteger const kVerticalPipeGap = 100;
     // Flash background if contact is detected
     if (_moving.speed > 0) {
         _moving.speed = 0; // stop the world from moving
+        _bird.physicsBody.collisionBitMask = worldCategory;
+        
+        [_bird runAction:[SKAction rotateByAngle:M_PI * _bird.position.y * 0.01 duration:_bird.position.y * 0.003] completion:^{
+            _bird.speed = 0;
+        }];
     
         [self removeActionForKey:@"flash"];
         
@@ -243,15 +248,21 @@ CGFloat clamp(CGFloat min, CGFloat max, CGFloat value) {
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
+    if (_moving.speed > 0) {
+    // modify the bird's pitch based on its velocity vector if the bird isn't dying
+        _bird.zRotation = clamp( -1, 0.5, _bird.physicsBody.velocity.dy * ( _bird.physicsBody.velocity.dy < 0 ? 0.003 : 0.001 ) );
+    }
+
     
-    // modify the bird's pitch based on its velocity vector
-    _bird.zRotation = clamp( -1, 0.5, _bird.physicsBody.velocity.dy * ( _bird.physicsBody.velocity.dy < 0 ? 0.003 : 0.001 ) );
 }
 
 - (void) resetScene {
-    // Move bird to original position and reset velocity
+    // Move bird to original position and reset properties
     _bird.position = CGPointMake(self.frame.size.width / 4, CGRectGetMidY(self.frame)); // reset to original position
     _bird.physicsBody.velocity = (CGVectorMake(0, 0));
+    _bird.physicsBody.collisionBitMask = worldCategory | pipeCategory;
+    _bird.speed = 1.0;
+    _bird.zRotation = 0.0;
     
     // Remove all existing pipes
     [_pipes removeAllChildren];
