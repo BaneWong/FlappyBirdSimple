@@ -245,7 +245,7 @@ static NSInteger const kVerticalPipeGap = 100;
             _scoreLabelNode.text = [NSString stringWithFormat:@"%d", _score];
             
             // Visual feedback for score increment (animation)
-            [_scoreLabelNode runAction:[SKAction sequence:@[[SKAction scaleTo:1.5 duration:0.1]]]];
+            [_scoreLabelNode runAction:[SKAction sequence:@[[SKAction scaleTo:1.5 duration:0.1], [SKAction scaleTo:1.0 duration:0.1]]]];
              
         } else { // bird collided with world
             
