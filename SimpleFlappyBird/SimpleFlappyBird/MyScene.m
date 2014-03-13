@@ -17,6 +17,8 @@
     SKAction* _moveAndRemovePipes;
     SKNode* _moving;
     SKNode* _pipes; // parent for all pipe nodes
+    SKLabelNode* _scoreLabelNode;
+    NSInteger _score;
     BOOL _canRestart;
 }
 @end
@@ -26,9 +28,10 @@
 @implementation MyScene
 
 // Colliison detection bitmasks
-static const uint32_t birdCategory = 1 << 0;  // 001
-static const uint32_t worldCategory = 1 << 1; // 010
-static const uint32_t pipeCategory = 1 << 2; //  100
+static const uint32_t birdCategory  = 1 << 0; // 0001
+static const uint32_t worldCategory = 1 << 1; // 0010
+static const uint32_t pipeCategory  = 1 << 2; // 0100
+static const uint32_t scoreCategory = 1 << 3; // 1000
 
 // Parallax scrolling speed constants
 static const float SKYLINE_MOVEMENT_SCALE = 0.01;
@@ -112,13 +115,22 @@ static NSInteger const kVerticalPipeGap = 100;
             [_moving addChild:skylineSprite];
         }
         
-        
+        [self initScore];
         [self initBird];
         [self initPipes]; // load the pipe textures and action
         
 
     }
     return self;
+}
+
+-(void) initScore {
+    _score = 0;
+    _scoreLabelNode = [SKLabelNode labelNodeWithFontNamed:@"MarkerFelt-Wide"];
+    _scoreLabelNode.position = CGPointMake(CGRectGetMidX(self.frame), 3 * self.frame.size.height / 4);
+    _scoreLabelNode.zPosition = 100;
+    _scoreLabelNode.text = [NSString stringWithFormat:@"%d", _score];
+    [self addChild:_scoreLabelNode];
 }
 
 -(void) initBird {
@@ -196,6 +208,15 @@ static NSInteger const kVerticalPipeGap = 100;
     [pipePair addChild:pipe1];
     [pipePair addChild:pipe2];
     
+    // add a contact node as a child of the pipePair
+    SKNode* contactNode = [SKNode node];
+    contactNode.position = CGPointMake(pipe1.size.width + _bird.size.width / 2, CGRectGetMidY(self.frame));
+    contactNode.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:CGSizeMake(pipe2.size.width, self.frame.size.height)];
+    contactNode.physicsBody.dynamic = NO;
+    contactNode.physicsBody.categoryBitMask = scoreCategory;
+    contactNode.physicsBody.contactTestBitMask = birdCategory;
+    [pipePair addChild:contactNode];
+    
     [pipePair runAction:_moveAndRemovePipes];
     
     [_pipes addChild:pipePair];
@@ -216,22 +237,36 @@ static NSInteger const kVerticalPipeGap = 100;
 - (void) didBeginContact:(SKPhysicsContact *)contact {
     // Flash background if contact is detected
     if (_moving.speed > 0) {
-        _moving.speed = 0; // stop the world from moving
-        _bird.physicsBody.collisionBitMask = worldCategory;
         
-        [_bird runAction:[SKAction rotateByAngle:M_PI * _bird.position.y * 0.01 duration:_bird.position.y * 0.003] completion:^{
-            _bird.speed = 0;
-        }];
-    
-        [self removeActionForKey:@"flash"];
+        // Bird has contact with score entitiy
+        // the first obj is a scorebox                                         or                    // the second object is a scorebox
+        if( ( contact.bodyA.categoryBitMask & scoreCategory ) == scoreCategory || ( contact.bodyB.categoryBitMask & scoreCategory ) == scoreCategory ) {
+            _score++;
+            _scoreLabelNode.text = [NSString stringWithFormat:@"%d", _score];
+            
+            // Visual feedback for score increment (animation)
+            [_scoreLabelNode runAction:[SKAction sequence:@[[SKAction scaleTo:1.5 duration:0.1]]]];
+             
+        } else { // bird collided with world
+            
+                
+            _moving.speed = 0; // stop the world from moving
+            _bird.physicsBody.collisionBitMask = worldCategory;
+            
+            [_bird runAction:[SKAction rotateByAngle:M_PI * _bird.position.y * 0.01 duration:_bird.position.y * 0.003] completion:^{
+                _bird.speed = 0;
+            }];
         
-        [self runAction:[SKAction sequence:@[[SKAction repeatAction:[SKAction sequence:@[[SKAction runBlock:^{
-            self.backgroundColor = [SKColor redColor];
-        }], [SKAction waitForDuration:0.05], [SKAction runBlock:^{
-            self.backgroundColor = _skyColor;
-        }], [SKAction waitForDuration:0.05]]] count:4], [SKAction runBlock:^{
-            _canRestart = YES;
-        }]]] withKey:@"flash"];;
+            [self removeActionForKey:@"flash"];
+            
+            [self runAction:[SKAction sequence:@[[SKAction repeatAction:[SKAction sequence:@[[SKAction runBlock:^{
+                self.backgroundColor = [SKColor redColor];
+            }], [SKAction waitForDuration:0.05], [SKAction runBlock:^{
+                self.backgroundColor = _skyColor;
+            }], [SKAction waitForDuration:0.05]]] count:4], [SKAction runBlock:^{
+                _canRestart = YES;
+            }]]] withKey:@"flash"];
+        }
     }
 }
 
@@ -272,6 +307,9 @@ CGFloat clamp(CGFloat min, CGFloat max, CGFloat value) {
     
     // Restart animation
     _moving.speed = 1;
+    
+    _score = 0;
+    _scoreLabelNode.text = [NSString stringWithFormat:@"%d", _score];
 }
 
 @end
